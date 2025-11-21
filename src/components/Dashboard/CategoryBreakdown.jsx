@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFinance } from '../../context/FinanceContext';
 import styles from './CategoryBreakdown.module.css';
+import { getCategoryColor } from '../../utils/colors';
 
 const CategoryBreakdown = () => {
     const { getExpensesByCategory, expense } = useFinance();
@@ -14,8 +15,6 @@ const CategoryBreakdown = () => {
             </div>
         );
     }
-
-    const maxVal = categories[0].value; // Since it's sorted
 
     return (
         <div className={`glass-panel ${styles.container}`}>
@@ -38,10 +37,6 @@ const CategoryBreakdown = () => {
                             </div>
 
                             <div className={styles.progressBg}>
-                                import {getCategoryColor} from '../../utils/colors';
-
-                                // ... inside component ...
-
                                 <div
                                     className={styles.progressBar}
                                     style={{

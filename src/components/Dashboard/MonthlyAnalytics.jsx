@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useFinance } from '../../context/FinanceContext';
 import styles from './MonthlyAnalytics.module.css';
 import { Calendar, TrendDown, Trophy } from '@phosphor-icons/react';
+import { getCategoryColor } from '../../utils/colors';
 
 const MonthlyAnalytics = () => {
     const { transactions } = useFinance();
@@ -13,7 +14,6 @@ const MonthlyAnalytics = () => {
         const [year, month] = selectedMonth.split('-');
 
         const filtered = transactions.filter(t => {
-            const tDate = new Date(t.date);
             // Ajuste para fuso horário local se necessário, mas slice simples funciona para YYYY-MM ISO
             return t.date.startsWith(selectedMonth) && t.type === 'expense';
         });
@@ -82,13 +82,32 @@ const MonthlyAnalytics = () => {
                             {monthlyData.sortedCategories.length > 0 ? (
                                 monthlyData.sortedCategories.map((cat) => (
                                     <div key={cat.name} className={styles.item}>
-                            )}
+                                        <div className={styles.itemHeader}>
+                                            <span>{cat.name}</span>
+                                            <span>
+                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cat.value)}
+                                            </span>
+                                        </div>
+                                        <div className={styles.progressBg}>
+                                            <div
+                                                className={styles.progressBar}
+                                                style={{
+                                                    width: `${(cat.value / monthlyData.totalExpense) * 100}%`,
+                                                    background: getCategoryColor(cat.name)
+                                                }}
+                                            />
+                                        </div>
                                     </div>
+                                ))
+                            ) : (
+                                <p className={styles.empty}>Nenhuma despesa neste mês.</p>
+                            )}
+                        </div>
                     </div>
-                    </div>
-            )}
                 </div>
-            );
+            )}
+        </div>
+    );
 };
 
-            export default MonthlyAnalytics;
+export default MonthlyAnalytics;
