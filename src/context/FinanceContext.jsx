@@ -12,27 +12,12 @@ import {
 import { useAuth } from './AuthContext';
 
 const FinanceContext = createContext();
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { db } from '../services/firebase';
-import {
-    collection,
-    addDoc,
-    deleteDoc,
-    doc,
-    onSnapshot,
-    query,
-    where
-} from 'firebase/firestore';
-import { useAuth } from './AuthContext';
-
-const FinanceContext = createContext();
 
 export const FinanceProvider = ({ children }) => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { user } = useAuth();
-
     const [error, setError] = useState(null);
+    const { user } = useAuth();
 
     useEffect(() => {
         if (!user) {
