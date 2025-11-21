@@ -38,9 +38,16 @@ const CategoryBreakdown = () => {
                             </div>
 
                             <div className={styles.progressBg}>
+                                import {getCategoryColor} from '../../utils/colors';
+
+                                // ... inside component ...
+
                                 <div
                                     className={styles.progressBar}
-                                    style={{ width: `${percentage}%`, background: isHighest ? 'var(--accent-red)' : 'var(--primary)' }}
+                                    style={{
+                                        width: `${percentage}%`,
+                                        background: getCategoryColor(cat.name)
+                                    }}
                                 />
                             </div>
                         </div>

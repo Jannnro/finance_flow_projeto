@@ -82,29 +82,13 @@ const MonthlyAnalytics = () => {
                             {monthlyData.sortedCategories.length > 0 ? (
                                 monthlyData.sortedCategories.map((cat) => (
                                     <div key={cat.name} className={styles.item}>
-                                        <div className={styles.itemHeader}>
-                                            <span>{cat.name}</span>
-                                            <span>
-                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cat.value)}
-                                            </span>
-                                        </div>
-                                        <div className={styles.progressBg}>
-                                            <div
-                                                className={styles.progressBar}
-                                                style={{ width: `${(cat.value / monthlyData.totalExpense) * 100}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className={styles.empty}>Nenhuma despesa neste mês.</p>
                             )}
-                        </div>
+                                    </div>
                     </div>
-                </div>
+                    </div>
             )}
-        </div>
-    );
+                </div>
+            );
 };
 
-export default MonthlyAnalytics;
+            export default MonthlyAnalytics;
