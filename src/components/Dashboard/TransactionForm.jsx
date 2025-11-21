@@ -1,0 +1,143 @@
+import React, { useState } from 'react';
+import { useFinance } from '../../context/FinanceContext';
+import styles from './TransactionForm.module.css';
+import { ArrowCircleUp, ArrowCircleDown } from '@phosphor-icons/react';
+
+const TransactionForm = ({ onClose }) => {
+    const { addTransaction } = useFinance();
+    const [type, setType] = useState('expense');
+    const [description, setDescription] = useState('');
+    const [value, setValue] = useState('');
+    const [category, setCategory] = useState('');
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [method, setMethod] = useState('pix');
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!description || !value || !category) return;
+
+        addTransaction({
+            type,
+            description,
+            value: Number(value),
+            category,
+            date,
+            method: type === 'expense' ? method : null
+        });
+
+        onClose();
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.typeSelector}>
+                <button
+                    type="button"
+                    className={`${styles.typeBtn} ${type === 'income' ? styles.activeIncome : ''}`}
+                    onClick={() => setType('income')}
+                >
+                    <ArrowCircleUp size={24} />
+                    Receita
+                </button>
+                <button
+                    type="button"
+                    className={`${styles.typeBtn} ${type === 'expense' ? styles.activeExpense : ''}`}
+                    onClick={() => setType('expense')}
+                >
+                    <ArrowCircleDown size={24} />
+                    Despesa
+                </button>
+            </div>
+
+            <div className={styles.inputGroup}>
+                <label>Descrição</label>
+                <input
+                    type="text"
+                    placeholder="Ex: Salário, Mercado"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                />
+            </div>
+
+            <div className={styles.inputGroup}>
+                <label>Valor</label>
+                <input
+                    type="number"
+                    placeholder="0,00"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    required
+                    step="0.01"
+                />
+            </div>
+
+            <div className={styles.row}>
+                <div className={styles.inputGroup}>
+                    <label>Categoria</label>
+                    <input
+                        type="text"
+                        placeholder="Ex: Alimentação"
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        required
+                        list="categories"
+                    />
+                    <datalist id="categories">
+                        <option value="Alimentação" />
+                        <option value="Moradia" />
+                        <option value="Transporte" />
+                        <option value="Lazer" />
+                        <option value="Saúde" />
+                        <option value="Salário" />
+                        <option value="Investimentos" />
+                    </datalist>
+                </div>
+
+                <div className={styles.inputGroup}>
+                    <label>Data</label>
+                    <input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        required
+                    />
+                </div>
+            </div>
+
+            {type === 'expense' && (
+                <div className={styles.inputGroup}>
+                    <label>Método de Pagamento</label>
+                    <div className={styles.radioGroup}>
+                        <label className={`${styles.radioLabel} ${method === 'pix' ? styles.selected : ''}`}>
+                            <input
+                                type="radio"
+                                name="method"
+                                value="pix"
+                                checked={method === 'pix'}
+                                onChange={(e) => setMethod(e.target.value)}
+                            />
+                            Pix
+                        </label>
+                        <label className={`${styles.radioLabel} ${method === 'card' ? styles.selected : ''}`}>
+                            <input
+                                type="radio"
+                                name="method"
+                                value="card"
+                                checked={method === 'card'}
+                                onChange={(e) => setMethod(e.target.value)}
+                            />
+                            Cartão
+                        </label>
+                    </div>
+                </div>
+            )}
+
+            <button type="submit" className={styles.submitBtn}>
+                Cadastrar
+            </button>
+        </form>
+    );
+};
+
+export default TransactionForm;

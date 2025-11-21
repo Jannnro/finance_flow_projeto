@@ -1,0 +1,115 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.typeSelector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.typeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.typeBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.activeIncome {
+    background: rgba(0, 176, 155, 0.1);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+.activeExpense {
+    background: rgba(255, 65, 108, 0.1);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inputGroup label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.inputGroup input {
+    padding: 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+}
+
+.inputGroup input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.radioGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.radioLabel {
+    flex: 1;
+    padding: 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.radioLabel input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.radioLabel.selected {
+    background: rgba(0, 210, 255, 0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.submitBtn {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--accent-green);
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: filter 0.2s;
+}
+
+.submitBtn:hover {
+    filter: brightness(1.1);
+}

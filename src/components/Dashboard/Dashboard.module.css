@@ -1,0 +1,135 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+.welcome h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome p {
+    color: var(--text-muted);
+}
+
+.logoutBtn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.8rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+    background: rgba(255, 65, 108, 0.2);
+    color: var(--accent-red);
+}
+
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.mainContent {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.sectionTitle {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.addBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.addBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+.modalContent {
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    background: #1a1a2e;
+    /* Solid fallback or darker glass */
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.closeBtn {
+    background: none;
+    color: var(--text-muted);
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: white;
+}
+
+@media (max-width: 900px) {
+    .mainContent {
+        grid-template-columns: 1fr;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
