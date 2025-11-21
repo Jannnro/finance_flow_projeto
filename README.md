@@ -6,24 +6,26 @@ Aplicativo de controle financeiro moderno e elegante, desenvolvido para ajudar u
 
 ## ✨ Funcionalidades
 
-- **Autenticação Simplificada**: Login rápido com Nome e Email (persistência local).
+- **Autenticação Segura**: Login via **Google** (Firebase Authentication).
+- **Sincronização em Nuvem**: Seus dados salvos no **Firestore**, acessíveis de qualquer dispositivo (PC, Celular, Tablet).
 - **Dashboard Intuitivo**: Visão geral do Saldo, Receitas e Despesas.
 - **Gestão de Transações**:
-  - Adicionar Receitas e Despesas.
-  - Categorização de gastos (Alimentação, Transporte, Lazer, etc.).
-  - Seleção de método de pagamento (Pix ou Cartão).
+  - **Receitas**: Salário, Aluguel, Investimentos.
+  - **Despesas**: Alimentação, Saúde, Transporte, Lazer, Moradia, Investimentos.
+  - Seleção de método de pagamento (Pix ou Cartão) para despesas.
 - **Analytics**:
   - Gráfico de barras mostrando gastos por categoria.
   - Destaque automático para a categoria com maior consumo.
 - **Design Premium**: Interface estilo *Glassmorphism* (efeito de vidro), totalmente responsiva e com animações fluidas.
-- **Privacidade**: Todos os dados são salvos no navegador do usuário (`localStorage`), sem envio para servidores externos.
 
 ## 🛠️ Tecnologias Utilizadas
 
 - **React** (Vite): Para uma aplicação rápida e reativa.
+- **Firebase**:
+  - **Authentication**: Gestão de usuários segura.
+  - **Firestore**: Banco de dados NoSQL em tempo real.
 - **CSS Modules**: Estilização modular e organizada.
 - **Phosphor Icons**: Ícones modernos e consistentes.
-- **LocalStorage**: Para persistência de dados client-side.
 
 ## 🚀 Processo de Desenvolvimento
 
