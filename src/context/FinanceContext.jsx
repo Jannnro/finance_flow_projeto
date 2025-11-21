@@ -12,18 +12,39 @@ import {
 import { useAuth } from './AuthContext';
 
 const FinanceContext = createContext();
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { db } from '../services/firebase';
+import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    query,
+    where
+} from 'firebase/firestore';
+import { useAuth } from './AuthContext';
+
+const FinanceContext = createContext();
 
 export const FinanceProvider = ({ children }) => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
 
+    const [error, setError] = useState(null);
+
     useEffect(() => {
         if (!user) {
+            console.log("FinanceContext: Usuário não autenticado.");
             setTransactions([]);
             setLoading(false);
             return;
         }
+
+        console.log("FinanceContext: Iniciando busca para usuário:", user.uid);
+        setLoading(true);
+        setError(null);
 
         // Simplified query to avoid "Missing Index" error
         const q = query(
@@ -32,6 +53,7 @@ export const FinanceProvider = ({ children }) => {
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
+            console.log("FinanceContext: Snapshot recebido. Docs:", snapshot.docs.length);
             const docs = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
@@ -48,8 +70,9 @@ export const FinanceProvider = ({ children }) => {
 
             setTransactions(docs);
             setLoading(false);
-        }, (error) => {
-            console.error("Erro ao buscar transações:", error);
+        }, (err) => {
+            console.error("FinanceContext: Erro no Snapshot:", err);
+            setError(err.message);
             setLoading(false);
         });
 
@@ -60,22 +83,27 @@ export const FinanceProvider = ({ children }) => {
         if (!user) return;
 
         try {
+            console.log("FinanceContext: Adicionando transação...", transaction);
             await addDoc(collection(db, "transactions"), {
                 uid: user.uid,
                 createdAt: new Date().toISOString(),
                 ...transaction,
                 value: parseFloat(transaction.value)
             });
-        } catch (error) {
-            console.error("Erro ao adicionar transação:", error);
+            console.log("FinanceContext: Transação adicionada com sucesso!");
+        } catch (err) {
+            console.error("FinanceContext: Erro ao adicionar:", err);
+            setError("Erro ao salvar: " + err.message);
+            alert("Erro ao salvar: " + err.message);
         }
     };
 
     const removeTransaction = async (id) => {
         try {
             await deleteDoc(doc(db, "transactions", id));
-        } catch (error) {
-            console.error("Erro ao remover transação:", error);
+        } catch (err) {
+            console.error("Erro ao remover transação:", err);
+            setError("Erro ao remover: " + err.message);
         }
     };
 
@@ -113,7 +141,8 @@ export const FinanceProvider = ({ children }) => {
                 expense,
                 balance,
                 getExpensesByCategory,
-                loading
+                loading,
+                error
             }}
         >
             {children}
