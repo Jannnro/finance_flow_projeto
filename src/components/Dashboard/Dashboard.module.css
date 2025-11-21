@@ -1,3 +1,37 @@
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tabBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.tabBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.activeTab {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Existing styles below... */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -8,7 +42,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 .welcome h1 {
@@ -22,22 +56,28 @@
 
 .logoutBtn {
     background: rgba(255, 255, 255, 0.1);
+    border: none;
     color: white;
-    padding: 0.8rem;
-    border-radius: 50%;
-    transition: all 0.2s;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
 .logoutBtn:hover {
-    background: rgba(255, 65, 108, 0.2);
-    color: var(--accent-red);
+    background: rgba(255, 0, 85, 0.2);
+    color: var(--neon-red);
 }
 
 .summaryGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
 }
 
 .mainContent {
@@ -46,16 +86,21 @@
     gap: 2rem;
 }
 
-.sectionTitle {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
+.leftColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .addBtn {
@@ -63,19 +108,19 @@
     align-items: center;
     gap: 0.5rem;
     background: var(--primary-gradient);
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
     color: white;
-    padding: 0.8rem 1.5rem;
-    border-radius: 12px;
     font-weight: 600;
+    cursor: pointer;
     transition: transform 0.2s;
 }
 
 .addBtn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
 }
 
-/* Modal */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -88,16 +133,14 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    animation: fadeIn 0.2s ease;
+    animation: fadeIn 0.2s ease-out;
 }
 
 .modalContent {
     width: 100%;
     max-width: 500px;
     padding: 2rem;
-    background: #1a1a2e;
-    /* Solid fallback or darker glass */
-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+    animation: slideUp 0.3s ease-out;
 }
 
 .modalHeader {
@@ -108,9 +151,11 @@
 }
 
 .closeBtn {
-    background: none;
+    background: transparent;
+    border: none;
     color: var(--text-muted);
     font-size: 2rem;
+    cursor: pointer;
     line-height: 1;
 }
 
@@ -118,9 +163,15 @@
     color: white;
 }
 
-@media (max-width: 900px) {
-    .mainContent {
-        grid-template-columns: 1fr;
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
@@ -131,5 +182,11 @@
 
     to {
         opacity: 1;
+    }
+}
+
+@media (max-width: 900px) {
+    .mainContent {
+        grid-template-columns: 1fr;
     }
 }

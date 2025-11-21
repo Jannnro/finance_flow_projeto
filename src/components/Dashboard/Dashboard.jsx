@@ -8,60 +8,87 @@ import CategoryBreakdown from './CategoryBreakdown';
 import styles from './Dashboard.module.css';
 import { SignOut, Plus, Wallet, TrendUp, TrendDown } from '@phosphor-icons/react';
 
+import MonthlyAnalytics from './MonthlyAnalytics';
+import { ChartBar, House } from '@phosphor-icons/react';
+
 const Dashboard = () => {
     const { user, logout } = useAuth();
     const { income, expense, balance } = useFinance();
     const [showForm, setShowForm] = useState(false);
+    const [activeTab, setActiveTab] = useState('overview');
 
     return (
         <div className={styles.container}>
             <header className={styles.header}>
                 <div className={styles.welcome}>
                     <h1>Olá, {user?.name}</h1>
-                    <p>Aqui está o resumo das suas finanças hoje.</p>
+                    <p>Aqui está o resumo das suas finanças.</p>
                 </div>
                 <button onClick={logout} className={styles.logoutBtn} title="Sair">
                     <SignOut size={24} />
                 </button>
             </header>
 
-            <div className={styles.summaryGrid}>
-                <SummaryCard
-                    title="Saldo Total"
-                    value={balance}
-                    icon={<Wallet size={32} weight="duotone" />}
-                    type="balance"
-                />
-                <SummaryCard
-                    title="Receitas"
-                    value={income}
-                    icon={<TrendUp size={32} weight="duotone" />}
-                    type="income"
-                />
-                <SummaryCard
-                    title="Despesas"
-                    value={expense}
-                    icon={<TrendDown size={32} weight="duotone" />}
-                    type="expense"
-                />
+            <div className={styles.tabs}>
+                <button
+                    className={`${styles.tabBtn} ${activeTab === 'overview' ? styles.activeTab : ''}`}
+                    onClick={() => setActiveTab('overview')}
+                >
+                    <House size={20} />
+                    Visão Geral
+                </button>
+                <button
+                    className={`${styles.tabBtn} ${activeTab === 'analytics' ? styles.activeTab : ''}`}
+                    onClick={() => setActiveTab('analytics')}
+                >
+                    <ChartBar size={20} />
+                    Análise Mensal
+                </button>
             </div>
 
-            <div className={styles.mainContent}>
-                <div className={styles.leftColumn}>
-                    <div className={styles.actions}>
-                        <h2 className={styles.sectionTitle}>Transações</h2>
-                        <button onClick={() => setShowForm(true)} className={styles.addBtn}>
-                            <Plus size={20} weight="bold" /> Nova Transação
-                        </button>
+            {activeTab === 'overview' ? (
+                <>
+                    <div className={styles.summaryGrid}>
+                        <SummaryCard
+                            title="Saldo Total"
+                            value={balance}
+                            icon={<Wallet size={32} weight="duotone" />}
+                            type="balance"
+                        />
+                        <SummaryCard
+                            title="Receitas"
+                            value={income}
+                            icon={<TrendUp size={32} weight="duotone" />}
+                            type="income"
+                        />
+                        <SummaryCard
+                            title="Despesas"
+                            value={expense}
+                            icon={<TrendDown size={32} weight="duotone" />}
+                            type="expense"
+                        />
                     </div>
 
-                    <TransactionList />
-                </div>
+                    <div className={styles.mainContent}>
+                        <div className={styles.leftColumn}>
+                            <div className={styles.actions}>
+                                <h2 className={styles.sectionTitle}>Transações</h2>
+                                <button onClick={() => setShowForm(true)} className={styles.addBtn}>
+                                    <Plus size={20} weight="bold" /> Nova Transação
+                                </button>
+                            </div>
 
-                <div className={styles.rightColumn}>
-                    <CategoryBreakdown />
-                </div>
-            </div>
+                            <TransactionList />
+                        </div>
+
+                        <div className={styles.rightColumn}>
+                            <CategoryBreakdown />
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <MonthlyAnalytics />
+            )}
 
             {showForm && (
                 <div className={styles.modalOverlay}>
