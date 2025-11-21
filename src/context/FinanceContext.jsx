@@ -1,39 +1,74 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { db } from '../services/firebase';
+import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    query,
+    where,
+    orderBy
+} from 'firebase/firestore';
+import { useAuth } from './AuthContext';
 
 const FinanceContext = createContext();
 
 export const FinanceProvider = ({ children }) => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
 
-    // Load from LocalStorage
     useEffect(() => {
-        const storedData = localStorage.getItem('finance_transactions');
-        if (storedData) {
-            setTransactions(JSON.parse(storedData));
+        if (!user) {
+            setTransactions([]);
+            setLoading(false);
+            return;
         }
-        setLoading(false);
-    }, []);
 
-    // Save to LocalStorage whenever transactions change
-    useEffect(() => {
-        if (!loading) {
-            localStorage.setItem('finance_transactions', JSON.stringify(transactions));
+        const q = query(
+            collection(db, "transactions"),
+            where("uid", "==", user.uid),
+            orderBy("date", "desc"),
+            orderBy("createdAt", "desc")
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const docs = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setTransactions(docs);
+            setLoading(false);
+        }, (error) => {
+            console.error("Erro ao buscar transações:", error);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [user]);
+
+    const addTransaction = async (transaction) => {
+        if (!user) return;
+
+        try {
+            await addDoc(collection(db, "transactions"), {
+                uid: user.uid,
+                createdAt: new Date().toISOString(),
+                ...transaction,
+                value: parseFloat(transaction.value)
+            });
+        } catch (error) {
+            console.error("Erro ao adicionar transação:", error);
         }
-    }, [transactions, loading]);
-
-    const addTransaction = (transaction) => {
-        const newTransaction = {
-            id: crypto.randomUUID(),
-            createdAt: new Date().toISOString(),
-            ...transaction,
-            value: parseFloat(transaction.value) // Ensure number
-        };
-        setTransactions((prev) => [newTransaction, ...prev]);
     };
 
-    const removeTransaction = (id) => {
-        setTransactions((prev) => prev.filter((t) => t.id !== id));
+    const removeTransaction = async (id) => {
+        try {
+            await deleteDoc(doc(db, "transactions", id));
+        } catch (error) {
+            console.error("Erro ao remover transação:", error);
+        }
     };
 
     // Computed Values
@@ -47,7 +82,6 @@ export const FinanceProvider = ({ children }) => {
 
     const balance = income - expense;
 
-    // Analytics: Expenses by Category
     const getExpensesByCategory = () => {
         const categories = {};
         transactions
@@ -58,7 +92,7 @@ export const FinanceProvider = ({ children }) => {
 
         return Object.entries(categories)
             .map(([name, value]) => ({ name, value }))
-            .sort((a, b) => b.value - a.value); // Sort by highest expense
+            .sort((a, b) => b.value - a.value);
     };
 
     return (

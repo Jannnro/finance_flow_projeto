@@ -1,4 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { auth, googleProvider } from '../services/firebase';
+import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 
 const AuthContext = createContext();
 
@@ -7,26 +9,38 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('finance_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser({
+          uid: currentUser.uid,
+          name: currentUser.displayName || currentUser.email,
+          email: currentUser.email,
+          photoURL: currentUser.photoURL
+        });
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = (name, email) => {
-    const userData = { name, email };
-    setUser(userData);
-    localStorage.setItem('finance_user', JSON.stringify(userData));
+  const loginGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Erro ao logar com Google:", error);
+      alert("Erro ao fazer login. Verifique o console.");
+    }
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('finance_user');
+    signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, loginGoogle, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
