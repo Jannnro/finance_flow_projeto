@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Erro ao logar com Google:", error);
-      alert("Erro ao fazer login. Verifique o console.");
+      alert(`Erro ao fazer login: ${error.code} - ${error.message}`);
     }
   };
 

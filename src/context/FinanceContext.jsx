@@ -7,8 +7,7 @@ import {
     doc,
     onSnapshot,
     query,
-    where,
-    orderBy
+    where
 } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 
@@ -26,11 +25,10 @@ export const FinanceProvider = ({ children }) => {
             return;
         }
 
+        // Simplified query to avoid "Missing Index" error
         const q = query(
             collection(db, "transactions"),
-            where("uid", "==", user.uid),
-            orderBy("date", "desc"),
-            orderBy("createdAt", "desc")
+            where("uid", "==", user.uid)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -38,6 +36,16 @@ export const FinanceProvider = ({ children }) => {
                 id: doc.id,
                 ...doc.data()
             }));
+
+            // Sort client-side
+            docs.sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                if (dateA > dateB) return -1;
+                if (dateA < dateB) return 1;
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+
             setTransactions(docs);
             setLoading(false);
         }, (error) => {
