@@ -75,23 +75,30 @@ const TransactionForm = ({ onClose }) => {
             <div className={styles.row}>
                 <div className={styles.inputGroup}>
                     <label>Categoria</label>
-                    <input
-                        type="text"
-                        placeholder="Ex: Alimentação"
+                    <select
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                        list="categories"
-                    />
-                    <datalist id="categories">
-                        <option value="Alimentação" />
-                        <option value="Moradia" />
-                        <option value="Transporte" />
-                        <option value="Lazer" />
-                        <option value="Saúde" />
-                        <option value="Salário" />
-                        <option value="Investimentos" />
-                    </datalist>
+                        className={styles.selectInput}
+                    >
+                        <option value="" disabled>Selecione uma categoria</option>
+                        {type === 'expense' ? (
+                            <>
+                                <option value="Alimentação">Alimentação</option>
+                                <option value="Saúde">Saúde</option>
+                                <option value="Transporte">Transporte</option>
+                                <option value="Lazer">Lazer</option>
+                                <option value="Moradia">Moradia</option>
+                                <option value="Investimentos">Investimentos</option>
+                            </>
+                        ) : (
+                            <>
+                                <option value="Salário">Salário</option>
+                                <option value="Aluguel">Aluguel</option>
+                                <option value="Investimentos">Investimentos</option>
+                            </>
+                        )}
+                    </select>
                 </div>
 
                 <div className={styles.inputGroup}>
