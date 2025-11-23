@@ -86,7 +86,52 @@ export const FinanceProvider = ({ children }) => {
     const removeTransaction = async (id) => {
         try {
             await deleteDoc(doc(db, "transactions", id));
-        </FinanceContext.Provider >
+        } catch (err) {
+            console.error("Erro ao remover transação:", err);
+            setError("Erro ao remover: " + err.message);
+        }
+    };
+
+    // Computed Values
+    const income = transactions
+        .filter((t) => t.type === 'income')
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const expense = transactions
+        .filter((t) => t.type === 'expense')
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const balance = income - expense;
+
+    const getExpensesByCategory = () => {
+        const categories = {};
+        transactions
+            .filter((t) => t.type === 'expense')
+            .forEach((t) => {
+                categories[t.category] = (categories[t.category] || 0) + t.value;
+            });
+
+        return Object.entries(categories)
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value);
+    };
+
+    return (
+        <FinanceContext.Provider
+            value={{
+                transactions,
+                addTransaction,
+                removeTransaction,
+                income,
+                expense,
+                balance,
+                getExpensesByCategory,
+                loading,
+                error
+            }}
+        >
+            {children}
+        </FinanceContext.Provider>
     );
 };
 
