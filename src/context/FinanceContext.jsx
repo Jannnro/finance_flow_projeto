@@ -101,20 +101,9 @@ export const FinanceProvider = ({ children }) => {
         .filter((t) => t.type === 'expense')
         .reduce((acc, curr) => acc + curr.value, 0);
 
-    const balance = income - expense;
-
-    const getExpensesByCategory = () => {
-        const categories = {};
-        transactions
-            .filter((t) => t.type === 'expense')
-            .forEach((t) => {
-                categories[t.category] = (categories[t.category] || 0) + t.value;
-            });
-
-        return Object.entries(categories)
-            .map(([name, value]) => ({ name, value }))
-            .sort((a, b) => b.value - a.value);
-    };
+    const cardExpense = transactions
+        .filter((t) => t.type === 'expense' && t.method === 'card')
+        .reduce((acc, curr) => acc + curr.value, 0);
 
     return (
         <FinanceContext.Provider
@@ -125,6 +114,7 @@ export const FinanceProvider = ({ children }) => {
                 income,
                 expense,
                 balance,
+                cardExpense,
                 getExpensesByCategory,
                 loading,
                 error
