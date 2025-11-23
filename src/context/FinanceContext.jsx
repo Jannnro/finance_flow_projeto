@@ -101,6 +101,8 @@ export const FinanceProvider = ({ children }) => {
         .filter((t) => t.type === 'expense')
         .reduce((acc, curr) => acc + curr.value, 0);
 
+    const balance = income - expense;
+
     const cardExpense = transactions
         .filter((t) => t.type === 'expense' && t.method === 'card')
         .reduce((acc, curr) => acc + curr.value, 0);
