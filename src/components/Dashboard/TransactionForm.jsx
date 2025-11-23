@@ -60,34 +60,13 @@ const TransactionForm = ({ onClose }) => {
                 >
                     <ArrowCircleUp size={24} />
                     Receita
-                </button>
-                <button
-                    type="button"
-                    className={`${styles.typeBtn} ${activeType === 'expense' ? styles.activeExpense : ''}`}
-                    onClick={() => setActiveType('expense')}
-                >
-                    <ArrowCircleDown size={24} />
-                    Despesa
-                </button>
-                <button
-                    type="button"
-                    className={`${styles.typeBtn} ${activeType === 'credit' ? styles.activeCredit : ''}`}
-                    onClick={() => setActiveType('credit')}
-                >
-                    <CreditCard size={24} />
-                    Cartão
-                </button>
-            </div>
-
-            <div className={styles.inputGroup}>
-                <label>Descrição</label>
-                <input
-                    type="text"
-                    placeholder="Ex: Salário, Mercado"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                />
+                    <input
+                        type="text"
+                        placeholder="Ex: Salário, Mercado"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        required
+                    />
             </div>
 
             <div className={styles.inputGroup}>
