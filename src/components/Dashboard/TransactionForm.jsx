@@ -11,19 +11,41 @@ const TransactionForm = ({ onClose }) => {
     const [category, setCategory] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [method, setMethod] = useState('pix');
+    const [isInstallment, setIsInstallment] = useState(false);
+    const [installments, setInstallments] = useState(1);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!description || !value || !category) return;
 
-        addTransaction({
-            type,
-            description,
-            value: Number(value),
-            category,
-            date,
-            method: type === 'expense' ? method : null
-        });
+        const numValue = Number(value);
+
+        if (type === 'expense' && method === 'card' && isInstallment && installments > 1) {
+            const installmentValue = numValue / installments;
+            let currentDate = new Date(date);
+
+            for (let i = 0; i < installments; i++) {
+                addTransaction({
+                    type,
+                    description: `${description} (${i + 1}/${installments})`,
+                    value: Number(installmentValue.toFixed(2)),
+                    category,
+                    date: currentDate.toISOString().split('T')[0],
+                    method
+                });
+                // Increment month
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+        } else {
+            addTransaction({
+                type,
+                description,
+                value: numValue,
+                category,
+                date,
+                method: type === 'expense' ? method : null
+            });
+        }
 
         onClose();
     };
@@ -61,7 +83,7 @@ const TransactionForm = ({ onClose }) => {
             </div>
 
             <div className={styles.inputGroup}>
-                <label>Valor</label>
+                <label>Valor {isInstallment && installments > 1 ? '(Total)' : ''}</label>
                 <input
                     type="number"
                     placeholder="0,00"
@@ -89,6 +111,8 @@ const TransactionForm = ({ onClose }) => {
                                 <option value="Transporte">Transporte</option>
                                 <option value="Lazer">Lazer</option>
                                 <option value="Moradia">Moradia</option>
+                                <option value="Água">Água</option>
+                                <option value="Luz">Luz</option>
                                 <option value="Investimentos">Investimentos</option>
                             </>
                         ) : (
@@ -102,7 +126,7 @@ const TransactionForm = ({ onClose }) => {
                 </div>
 
                 <div className={styles.inputGroup}>
-                    <label>Data</label>
+                    <label>Data {isInstallment && installments > 1 ? '(1ª Parcela)' : ''}</label>
                     <input
                         type="date"
                         value={date}
@@ -122,7 +146,10 @@ const TransactionForm = ({ onClose }) => {
                                 name="method"
                                 value="pix"
                                 checked={method === 'pix'}
-                                onChange={(e) => setMethod(e.target.value)}
+                                onChange={(e) => {
+                                    setMethod(e.target.value);
+                                    setIsInstallment(false);
+                                }}
                             />
                             Pix
                         </label>
@@ -137,6 +164,36 @@ const TransactionForm = ({ onClose }) => {
                             Cartão
                         </label>
                     </div>
+                </div>
+            )}
+
+            {type === 'expense' && method === 'card' && (
+                <div className={styles.row}>
+                    <div className={styles.inputGroup}>
+                        <label>Parcelado?</label>
+                        <select
+                            value={isInstallment ? 'yes' : 'no'}
+                            onChange={(e) => setIsInstallment(e.target.value === 'yes')}
+                            className={styles.selectInput}
+                        >
+                            <option value="no">Não (À vista)</option>
+                            <option value="yes">Sim</option>
+                        </select>
+                    </div>
+
+                    {isInstallment && (
+                        <div className={styles.inputGroup}>
+                            <label>Nº Parcelas</label>
+                            <input
+                                type="number"
+                                min="2"
+                                max="24"
+                                value={installments}
+                                onChange={(e) => setInstallments(Number(e.target.value))}
+                                className={styles.selectInput}
+                            />
+                        </div>
+                    )}
                 </div>
             )}
 

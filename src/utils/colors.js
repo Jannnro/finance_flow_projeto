@@ -7,6 +7,8 @@ export const CATEGORY_COLORS = {
     'Investimentos': '#FFD700', // Gold
     'Salário': '#00FF94',       // Neon Green
     'Aluguel': '#FF6B6B',       // Soft Red
+    'Água': '#4CC9F0',          // Light Blue
+    'Luz': '#F72585',           // Pink
     'Outros': '#8D99AE'         // Grey
 };
 
