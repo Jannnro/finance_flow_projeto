@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useFinance } from '../../context/FinanceContext';
 import styles from './TransactionForm.module.css';
-import { ArrowCircleUp, ArrowCircleDown, CreditCard } from '@phosphor-icons/react';
+import { ArrowCircleUp, ArrowCircleDown } from '@phosphor-icons/react';
 
 const TransactionForm = ({ onClose }) => {
     const { addTransaction } = useFinance();
-    const [activeType, setActiveType] = useState('expense'); // 'income', 'expense', 'credit'
+    const [type, setType] = useState('expense');
     const [description, setDescription] = useState('');
     const [value, setValue] = useState('');
     const [category, setCategory] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [method, setMethod] = useState('pix');
     const [isInstallment, setIsInstallment] = useState(false);
     const [installments, setInstallments] = useState(1);
 
@@ -18,22 +19,21 @@ const TransactionForm = ({ onClose }) => {
         if (!description || !value || !category) return;
 
         const numValue = Number(value);
-        const type = activeType === 'income' ? 'income' : 'expense';
-        const method = activeType === 'credit' ? 'card' : (activeType === 'income' ? null : 'pix');
 
-        if (activeType === 'credit' && isInstallment && installments > 1) {
+        if (type === 'expense' && method === 'card' && isInstallment && installments > 1) {
             const installmentValue = numValue / installments;
             let currentDate = new Date(date);
 
             for (let i = 0; i < installments; i++) {
                 addTransaction({
-                    type: 'expense',
+                    type,
                     description: `${description} (${i + 1}/${installments})`,
                     value: Number(installmentValue.toFixed(2)),
                     category,
                     date: currentDate.toISOString().split('T')[0],
-                    method: 'card'
+                    method
                 });
+                // Increment month
                 currentDate.setMonth(currentDate.getMonth() + 1);
             }
         } else {
@@ -43,7 +43,7 @@ const TransactionForm = ({ onClose }) => {
                 value: numValue,
                 category,
                 date,
-                method
+                method: type === 'expense' ? method : null
             });
         }
 
@@ -55,22 +55,35 @@ const TransactionForm = ({ onClose }) => {
             <div className={styles.typeSelector}>
                 <button
                     type="button"
-                    className={`${styles.typeBtn} ${activeType === 'income' ? styles.activeIncome : ''}`}
-                    onClick={() => setActiveType('income')}
+                    className={`${styles.typeBtn} ${type === 'income' ? styles.activeIncome : ''}`}
+                    onClick={() => setType('income')}
                 >
                     <ArrowCircleUp size={24} />
                     Receita
-                    <input
-                        type="text"
-                        placeholder="Ex: Salário, Mercado"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        required
-                    />
+                </button>
+                <button
+                    type="button"
+                    className={`${styles.typeBtn} ${type === 'expense' ? styles.activeExpense : ''}`}
+                    onClick={() => setType('expense')}
+                >
+                    <ArrowCircleDown size={24} />
+                    Despesa
+                </button>
             </div>
 
             <div className={styles.inputGroup}>
-                <label>Valor {activeType === 'credit' && isInstallment && installments > 1 ? '(Total)' : ''}</label>
+                <label>Descrição</label>
+                <input
+                    type="text"
+                    placeholder="Ex: Salário, Mercado"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                />
+            </div>
+
+            <div className={styles.inputGroup}>
+                <label>Valor {isInstallment && installments > 1 ? '(Total)' : ''}</label>
                 <input
                     type="number"
                     placeholder="0,00"
@@ -91,13 +104,7 @@ const TransactionForm = ({ onClose }) => {
                         className={styles.selectInput}
                     >
                         <option value="" disabled>Selecione uma categoria</option>
-                        {activeType === 'income' ? (
-                            <>
-                                <option value="Salário">Salário</option>
-                                <option value="Aluguel">Aluguel</option>
-                                <option value="Investimentos">Investimentos</option>
-                            </>
-                        ) : (
+                        {type === 'expense' ? (
                             <>
                                 <option value="Alimentação">Alimentação</option>
                                 <option value="Saúde">Saúde</option>
@@ -108,12 +115,18 @@ const TransactionForm = ({ onClose }) => {
                                 <option value="Luz">Luz</option>
                                 <option value="Investimentos">Investimentos</option>
                             </>
+                        ) : (
+                            <>
+                                <option value="Salário">Salário</option>
+                                <option value="Aluguel">Aluguel</option>
+                                <option value="Investimentos">Investimentos</option>
+                            </>
                         )}
                     </select>
                 </div>
 
                 <div className={styles.inputGroup}>
-                    <label>Data {activeType === 'credit' && isInstallment && installments > 1 ? '(1ª Parcela)' : ''}</label>
+                    <label>Data {isInstallment && installments > 1 ? '(1ª Parcela)' : ''}</label>
                     <input
                         type="date"
                         value={date}
@@ -123,7 +136,38 @@ const TransactionForm = ({ onClose }) => {
                 </div>
             </div>
 
-            {activeType === 'credit' && (
+            {type === 'expense' && (
+                <div className={styles.inputGroup}>
+                    <label>Método de Pagamento</label>
+                    <div className={styles.radioGroup}>
+                        <label className={`${styles.radioLabel} ${method === 'pix' ? styles.selected : ''}`}>
+                            <input
+                                type="radio"
+                                name="method"
+                                value="pix"
+                                checked={method === 'pix'}
+                                onChange={(e) => {
+                                    setMethod(e.target.value);
+                                    setIsInstallment(false);
+                                }}
+                            />
+                            Pix
+                        </label>
+                        <label className={`${styles.radioLabel} ${method === 'card' ? styles.selected : ''}`}>
+                            <input
+                                type="radio"
+                                name="method"
+                                value="card"
+                                checked={method === 'card'}
+                                onChange={(e) => setMethod(e.target.value)}
+                            />
+                            Cartão
+                        </label>
+                    </div>
+                </div>
+            )}
+
+            {type === 'expense' && method === 'card' && (
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
                         <label>Parcelado?</label>
