@@ -145,6 +145,7 @@ const TransactionForm = ({ onClose }) => {
                                 <option value="Luz">Luz</option>
                                 <option value="Internet">Internet</option>
                                 <option value="Investimentos">Investimentos</option>
+                                <option value="Outros">Outros</option>
                             </>
                         )}
                     </select>
