@@ -25,6 +25,47 @@ const TransactionList = () => {
                             <CreditCard size={20} className={styles.invoiceIcon} />
                         ) : (
                             <ArrowDown size={20} className={styles.expenseIcon} />
+                        )}
+                    </div>
+
+                    <div className={styles.details}>
+                        <span className={styles.description}>
+                            {t.description}
+                            {(t.type === 'invoice' || ['Água', 'Luz', 'Internet'].includes(t.category)) && t.status && (
+                                <span className={`${styles.statusBadge} ${t.status === 'paid' ? styles.paid : styles.open}`}>
+                                    {t.status === 'paid' ? 'Paga' : 'Em Aberto'}
+                                </span>
+                            )}
+                        </span>
+                        <div className={styles.meta}>
+                            <span className={styles.category}>{t.category}</span>
+                            <span className={styles.date}>
+                                {t.type === 'invoice' ? 'Vence: ' : ''}
+                                {new Date(t.date).toLocaleDateString('pt-BR')}
+                            </span>
+                            {t.method && t.type !== 'invoice' && <span className={styles.method}>• {t.method === 'pix' ? 'Pix' : 'Cartão'}</span>}
+                        </div>
+                    </div>
+
+                    <div className={styles.rightSide}>
+                        <span className={`${styles.value} ${t.type === 'income' ? styles.income : styles.expense}`}>
+                            {t.type === 'income' ? '+ ' : '- '}
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(t.value)}
+                        </span>
+
+                        {(t.type === 'invoice' || ['Água', 'Luz', 'Internet'].includes(t.category)) && (
+                            <button
+                                onClick={() => toggleInvoiceStatus(t.id, t.status || 'open')}
+                                className={styles.actionBtn}
+                                title={t.status === 'open' || !t.status ? "Marcar como Paga" : "Reabrir Conta"}
+                            >
+                                {(t.status === 'open' || !t.status) ? <CheckCircle size={18} /> : <ArrowCounterClockwise size={18} />}
+                            </button>
+                        )}
+
+                        <button onClick={() => removeTransaction(t.id)} className={styles.deleteBtn} title="Excluir">
+                            <Trash size={18} />
+                        </button>
                     </div>
                 </div>
             ))}
