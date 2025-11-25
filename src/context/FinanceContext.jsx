@@ -128,7 +128,11 @@ export const FinanceProvider = ({ children }) => {
     const getExpensesByCategory = () => {
         const categories = {};
         transactions
-            .filter((t) => t.type === 'expense')
+            .filter((t) => {
+                const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
+                const isPaidOrNoStatus = t.status === 'paid' || !t.status;
+                return isExpenseOrInvoice && isPaidOrNoStatus;
+            })
             .forEach((t) => {
                 categories[t.category] = (categories[t.category] || 0) + t.value;
             });
