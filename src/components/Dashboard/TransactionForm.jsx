@@ -53,7 +53,9 @@ const TransactionForm = ({ onClose }) => {
                 value: numValue,
                 category,
                 date,
-                method: activeType === 'expense' ? method : null
+                method: activeType === 'expense' ? method : null,
+                // Add status if it's a recurring bill category
+                status: (activeType === 'expense' && ['Água', 'Luz', 'Internet'].includes(category)) ? invoiceStatus : null
             });
         }
 
@@ -141,6 +143,7 @@ const TransactionForm = ({ onClose }) => {
                                 <option value="Moradia">Moradia</option>
                                 <option value="Água">Água</option>
                                 <option value="Luz">Luz</option>
+                                <option value="Internet">Internet</option>
                                 <option value="Investimentos">Investimentos</option>
                             </>
                         )}
@@ -158,9 +161,10 @@ const TransactionForm = ({ onClose }) => {
                 </div>
             </div>
 
-            {activeType === 'invoice' && (
+            {/* Show Status for Invoice OR Recurring Bills (Water, Light, Internet) */}
+            {(activeType === 'invoice' || (activeType === 'expense' && ['Água', 'Luz', 'Internet'].includes(category))) && (
                 <div className={styles.inputGroup}>
-                    <label>Status da Fatura</label>
+                    <label>Status do Pagamento</label>
                     <select
                         value={invoiceStatus}
                         onChange={(e) => setInvoiceStatus(e.target.value)}

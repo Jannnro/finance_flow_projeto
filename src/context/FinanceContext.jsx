@@ -114,7 +114,13 @@ export const FinanceProvider = ({ children }) => {
         .reduce((acc, curr) => acc + curr.value, 0);
 
     const expense = transactions
-        .filter((t) => (t.type === 'expense') || (t.type === 'invoice' && t.status === 'paid'))
+        .filter((t) => {
+            // Include if it's an expense/invoice AND (status is paid OR status is undefined/null)
+            // This effectively excludes any transaction with status === 'open'
+            const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
+            const isPaidOrNoStatus = t.status === 'paid' || !t.status;
+            return isExpenseOrInvoice && isPaidOrNoStatus;
+        })
         .reduce((acc, curr) => acc + curr.value, 0);
 
     const balance = income - expense;

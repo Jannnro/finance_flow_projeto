@@ -9,6 +9,7 @@ export const CATEGORY_COLORS = {
     'Aluguel': '#FF6B6B',       // Soft Red
     'Água': '#4CC9F0',          // Light Blue
     'Luz': '#F72585',           // Pink
+    'Internet': '#4361EE',      // Blue
     'Outros': '#8D99AE'         // Grey
 };
 
