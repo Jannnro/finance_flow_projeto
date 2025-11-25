@@ -7,7 +7,8 @@ import {
     doc,
     onSnapshot,
     query,
-    where
+    where,
+    updateDoc
 } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 
@@ -92,13 +93,28 @@ export const FinanceProvider = ({ children }) => {
         }
     };
 
+    const updateTransaction = async (id, updates) => {
+        try {
+            const docRef = doc(db, "transactions", id);
+            await updateDoc(docRef, updates);
+        } catch (err) {
+            console.error("Erro ao atualizar transação:", err);
+            setError("Erro ao atualizar: " + err.message);
+        }
+    };
+
+    const toggleInvoiceStatus = async (id, currentStatus) => {
+        const newStatus = currentStatus === 'open' ? 'paid' : 'open';
+        await updateTransaction(id, { status: newStatus });
+    };
+
     // Computed Values
     const income = transactions
         .filter((t) => t.type === 'income')
         .reduce((acc, curr) => acc + curr.value, 0);
 
     const expense = transactions
-        .filter((t) => t.type === 'expense')
+        .filter((t) => (t.type === 'expense') || (t.type === 'invoice' && t.status === 'paid'))
         .reduce((acc, curr) => acc + curr.value, 0);
 
     const balance = income - expense;
@@ -122,6 +138,7 @@ export const FinanceProvider = ({ children }) => {
                 transactions,
                 addTransaction,
                 removeTransaction,
+                toggleInvoiceStatus,
                 income,
                 expense,
                 balance,

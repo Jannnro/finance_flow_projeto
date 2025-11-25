@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useFinance } from '../../context/FinanceContext';
 import styles from './TransactionForm.module.css';
-import { ArrowCircleUp, ArrowCircleDown } from '@phosphor-icons/react';
+import { ArrowCircleUp, ArrowCircleDown, CreditCard } from '@phosphor-icons/react';
 
 const TransactionForm = ({ onClose }) => {
     const { addTransaction } = useFinance();
-    const [type, setType] = useState('expense');
+    const [activeType, setActiveType] = useState('expense'); // 'income', 'expense', 'invoice'
     const [description, setDescription] = useState('');
     const [value, setValue] = useState('');
     const [category, setCategory] = useState('');
@@ -13,6 +13,7 @@ const TransactionForm = ({ onClose }) => {
     const [method, setMethod] = useState('pix');
     const [isInstallment, setIsInstallment] = useState(false);
     const [installments, setInstallments] = useState(1);
+    const [invoiceStatus, setInvoiceStatus] = useState('open'); // 'open', 'paid'
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -20,30 +21,39 @@ const TransactionForm = ({ onClose }) => {
 
         const numValue = Number(value);
 
-        if (type === 'expense' && method === 'card' && isInstallment && installments > 1) {
+        if (activeType === 'invoice') {
+            addTransaction({
+                type: 'invoice',
+                description,
+                value: numValue,
+                category,
+                date, // This will act as due date for invoices
+                status: invoiceStatus,
+                method: 'card_bill'
+            });
+        } else if (activeType === 'expense' && method === 'card' && isInstallment && installments > 1) {
             const installmentValue = numValue / installments;
             let currentDate = new Date(date);
 
             for (let i = 0; i < installments; i++) {
                 addTransaction({
-                    type,
+                    type: 'expense',
                     description: `${description} (${i + 1}/${installments})`,
                     value: Number(installmentValue.toFixed(2)),
                     category,
                     date: currentDate.toISOString().split('T')[0],
                     method
                 });
-                // Increment month
                 currentDate.setMonth(currentDate.getMonth() + 1);
             }
         } else {
             addTransaction({
-                type,
+                type: activeType,
                 description,
                 value: numValue,
                 category,
                 date,
-                method: type === 'expense' ? method : null
+                method: activeType === 'expense' ? method : null
             });
         }
 
@@ -55,19 +65,27 @@ const TransactionForm = ({ onClose }) => {
             <div className={styles.typeSelector}>
                 <button
                     type="button"
-                    className={`${styles.typeBtn} ${type === 'income' ? styles.activeIncome : ''}`}
-                    onClick={() => setType('income')}
+                    className={`${styles.typeBtn} ${activeType === 'income' ? styles.activeIncome : ''}`}
+                    onClick={() => setActiveType('income')}
                 >
                     <ArrowCircleUp size={24} />
                     Receita
                 </button>
                 <button
                     type="button"
-                    className={`${styles.typeBtn} ${type === 'expense' ? styles.activeExpense : ''}`}
-                    onClick={() => setType('expense')}
+                    className={`${styles.typeBtn} ${activeType === 'expense' ? styles.activeExpense : ''}`}
+                    onClick={() => setActiveType('expense')}
                 >
                     <ArrowCircleDown size={24} />
                     Despesa
+                </button>
+                <button
+                    type="button"
+                    className={`${styles.typeBtn} ${activeType === 'invoice' ? styles.activeCredit : ''}`}
+                    onClick={() => setActiveType('invoice')}
+                >
+                    <CreditCard size={24} />
+                    Fatura
                 </button>
             </div>
 
@@ -75,7 +93,7 @@ const TransactionForm = ({ onClose }) => {
                 <label>Descrição</label>
                 <input
                     type="text"
-                    placeholder="Ex: Salário, Mercado"
+                    placeholder={activeType === 'invoice' ? "Ex: Fatura Nubank" : "Ex: Salário, Mercado"}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
@@ -104,7 +122,17 @@ const TransactionForm = ({ onClose }) => {
                         className={styles.selectInput}
                     >
                         <option value="" disabled>Selecione uma categoria</option>
-                        {type === 'expense' ? (
+                        {activeType === 'income' ? (
+                            <>
+                                <option value="Salário">Salário</option>
+                                <option value="Aluguel">Aluguel</option>
+                                <option value="Investimentos">Investimentos</option>
+                            </>
+                        ) : activeType === 'invoice' ? (
+                            <>
+                                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            </>
+                        ) : (
                             <>
                                 <option value="Alimentação">Alimentação</option>
                                 <option value="Saúde">Saúde</option>
@@ -115,18 +143,12 @@ const TransactionForm = ({ onClose }) => {
                                 <option value="Luz">Luz</option>
                                 <option value="Investimentos">Investimentos</option>
                             </>
-                        ) : (
-                            <>
-                                <option value="Salário">Salário</option>
-                                <option value="Aluguel">Aluguel</option>
-                                <option value="Investimentos">Investimentos</option>
-                            </>
                         )}
                     </select>
                 </div>
 
                 <div className={styles.inputGroup}>
-                    <label>Data {isInstallment && installments > 1 ? '(1ª Parcela)' : ''}</label>
+                    <label>{activeType === 'invoice' ? 'Vencimento' : (isInstallment && installments > 1 ? 'Data (1ª Parcela)' : 'Data')}</label>
                     <input
                         type="date"
                         value={date}
@@ -136,7 +158,21 @@ const TransactionForm = ({ onClose }) => {
                 </div>
             </div>
 
-            {type === 'expense' && (
+            {activeType === 'invoice' && (
+                <div className={styles.inputGroup}>
+                    <label>Status da Fatura</label>
+                    <select
+                        value={invoiceStatus}
+                        onChange={(e) => setInvoiceStatus(e.target.value)}
+                        className={styles.selectInput}
+                    >
+                        <option value="open">Em Aberto (Não desconta do saldo)</option>
+                        <option value="paid">Paga (Desconta do saldo)</option>
+                    </select>
+                </div>
+            )}
+
+            {activeType === 'expense' && (
                 <div className={styles.inputGroup}>
                     <label>Método de Pagamento</label>
                     <div className={styles.radioGroup}>
@@ -167,7 +203,7 @@ const TransactionForm = ({ onClose }) => {
                 </div>
             )}
 
-            {type === 'expense' && method === 'card' && (
+            {activeType === 'expense' && method === 'card' && (
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
                         <label>Parcelado?</label>
