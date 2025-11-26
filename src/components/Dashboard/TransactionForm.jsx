@@ -6,10 +6,26 @@ import { ArrowCircleUp, ArrowCircleDown, CreditCard } from '@phosphor-icons/reac
 const TransactionForm = ({ onClose, initialData }) => {
     const { addTransaction, updateTransaction } = useFinance();
 
+    // Helper to format currency
+    const formatCurrency = (val) => {
+        // Remove everything that is not a digit
+        const numericValue = val.replace(/\D/g, '');
+
+        // Convert to number and divide by 100 to handle cents
+        const floatValue = Number(numericValue) / 100;
+
+        // Format as BRL currency
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(floatValue);
+    };
+
     // Initialize state with initialData if available
     const [activeType, setActiveType] = useState(initialData?.type || 'expense');
     const [description, setDescription] = useState(initialData?.description || '');
-    const [value, setValue] = useState(initialData?.value || '');
+    // Initialize value with formatted string if initialData exists, otherwise empty string
+    const [value, setValue] = useState(initialData?.value ? formatCurrency(String(initialData.value * 100).replace('.', '')) : '');
     const [category, setCategory] = useState(initialData?.category || '');
     const [date, setDate] = useState(initialData?.date || new Date().toISOString().split('T')[0]);
     const [method, setMethod] = useState(initialData?.method || 'pix');
@@ -17,11 +33,22 @@ const TransactionForm = ({ onClose, initialData }) => {
     const [installments, setInstallments] = useState(1);
     const [invoiceStatus, setInvoiceStatus] = useState(initialData?.status || 'open');
 
+    const handleValueChange = (e) => {
+        const val = e.target.value;
+        setValue(formatCurrency(val));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!description || !value || !category) return;
 
-        const numValue = Number(value);
+        // Parse formatted string back to number
+        // Remove "R$", spaces, and dots. Replace comma with dot.
+        const cleanValue = value.replace(/[R$\s.]/g, '').replace(',', '.');
+        const numValue = Number(cleanValue);
+
+        if (isNaN(numValue) || numValue === 0) return;
+
         const transactionData = {
             type: activeType,
             description,
@@ -101,12 +128,11 @@ const TransactionForm = ({ onClose, initialData }) => {
             <div className={styles.inputGroup}>
                 <label>Valor {isInstallment && installments > 1 ? '(Total)' : ''}</label>
                 <input
-                    type="number"
-                    placeholder="0,00"
+                    type="text"
+                    placeholder="R$ 0,00"
                     value={value}
-                    onChange={(e) => setValue(e.target.value)}
+                    onChange={handleValueChange}
                     required
-                    step="0.01"
                 />
             </div>
 
