@@ -148,6 +148,7 @@ export const FinanceProvider = ({ children }) => {
                 transactions,
                 addTransaction,
                 removeTransaction,
+                updateTransaction,
                 toggleInvoiceStatus,
                 income,
                 expense,

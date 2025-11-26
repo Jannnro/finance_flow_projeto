@@ -14,6 +14,17 @@ const Dashboard = () => {
     const { income, expense, balance } = useFinance();
     const [showForm, setShowForm] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');
+    const [editingTransaction, setEditingTransaction] = useState(null);
+
+    const handleEdit = (transaction) => {
+        setEditingTransaction(transaction);
+        setShowForm(true);
+    };
+
+    const handleCloseForm = () => {
+        setShowForm(false);
+        setEditingTransaction(null);
+    };
 
     return (
         <div className={styles.container}>
@@ -71,35 +82,39 @@ const Dashboard = () => {
                         <div className={styles.leftColumn}>
                             <div className={styles.actions}>
                                 <h2 className={styles.sectionTitle}>Transações</h2>
-                                <button onClick={() => setShowForm(true)} className={styles.addBtn}>
-                                    <Plus size={20} weight="bold" /> Nova Transação
-                                </button>
                             </div>
-
-                            <TransactionList />
+                            <button onClick={() => { setEditingTransaction(null); setShowForm(true); }} className={styles.addBtn}>
+                                <Plus size={20} weight="bold" /> Nova Transação
+                            </button>
                         </div>
 
-                        <div className={styles.rightColumn}>
-                            <CategoryBreakdown />
-                        </div>
+                        <TransactionList onEdit={handleEdit} />
                     </div>
-                </>
-            ) : (
-                <MonthlyAnalytics />
-            )}
 
-            {showForm && (
-                <div className={styles.modalOverlay}>
-                    <div className={`glass-panel ${styles.modalContent}`}>
-                        <div className={styles.modalHeader}>
-                            <h2>Nova Transação</h2>
-                            <button onClick={() => setShowForm(false)} className={styles.closeBtn}>&times;</button>
-                        </div>
-                        <TransactionForm onClose={() => setShowForm(false)} />
+                    <div className={styles.rightColumn}>
+                        <CategoryBreakdown />
                     </div>
                 </div>
-            )}
+        </>
+    ) : (
+        <MonthlyAnalytics />
+    )
+}
+
+{
+    showForm && (
+        <div className={styles.modalOverlay}>
+            <div className={`glass-panel ${styles.modalContent}`}>
+                <div className={styles.modalHeader}>
+                    <h2>{editingTransaction ? 'Editar Transação' : 'Nova Transação'}</h2>
+                    <button onClick={handleCloseForm} className={styles.closeBtn}>&times;</button>
+                </div>
+                <TransactionForm onClose={handleCloseForm} initialData={editingTransaction} />
+            </div>
         </div>
+    )
+}
+        </div >
     );
 };
 

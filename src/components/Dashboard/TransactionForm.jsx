@@ -3,60 +3,56 @@ import { useFinance } from '../../context/FinanceContext';
 import styles from './TransactionForm.module.css';
 import { ArrowCircleUp, ArrowCircleDown, CreditCard } from '@phosphor-icons/react';
 
-const TransactionForm = ({ onClose }) => {
-    const { addTransaction } = useFinance();
-    const [activeType, setActiveType] = useState('expense'); // 'income', 'expense', 'invoice'
-    const [description, setDescription] = useState('');
-    const [value, setValue] = useState('');
-    const [category, setCategory] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [method, setMethod] = useState('pix');
-    const [isInstallment, setIsInstallment] = useState(false);
+const TransactionForm = ({ onClose, initialData }) => {
+    const { addTransaction, updateTransaction } = useFinance();
+
+    // Initialize state with initialData if available
+    const [activeType, setActiveType] = useState(initialData?.type || 'expense');
+    const [description, setDescription] = useState(initialData?.description || '');
+    const [value, setValue] = useState(initialData?.value || '');
+    const [category, setCategory] = useState(initialData?.category || '');
+    const [date, setDate] = useState(initialData?.date || new Date().toISOString().split('T')[0]);
+    const [method, setMethod] = useState(initialData?.method || 'pix');
+    const [isInstallment, setIsInstallment] = useState(false); // Don't support editing installments logic for now, just value
     const [installments, setInstallments] = useState(1);
-    const [invoiceStatus, setInvoiceStatus] = useState('open'); // 'open', 'paid'
+    const [invoiceStatus, setInvoiceStatus] = useState(initialData?.status || 'open');
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!description || !value || !category) return;
 
         const numValue = Number(value);
+        const transactionData = {
+            type: activeType,
+            description,
+            value: numValue,
+            category,
+            date,
+            method: activeType === 'expense' ? method : (activeType === 'invoice' ? 'card_bill' : null),
+            status: (activeType === 'invoice' || (activeType === 'expense' && ['Água', 'Luz', 'Internet'].includes(category))) ? invoiceStatus : null
+        };
 
-        if (activeType === 'invoice') {
-            addTransaction({
-                type: 'invoice',
-                description,
-                value: numValue,
-                category,
-                date, // This will act as due date for invoices
-                status: invoiceStatus,
-                method: 'card_bill'
-            });
-        } else if (activeType === 'expense' && method === 'card' && isInstallment && installments > 1) {
-            const installmentValue = numValue / installments;
-            let currentDate = new Date(date);
-
-            for (let i = 0; i < installments; i++) {
-                addTransaction({
-                    type: 'expense',
-                    description: `${description} (${i + 1}/${installments})`,
-                    value: Number(installmentValue.toFixed(2)),
-                    category,
-                    date: currentDate.toISOString().split('T')[0],
-                    method
-                });
-                currentDate.setMonth(currentDate.getMonth() + 1);
-            }
+        if (initialData) {
+            // Update existing transaction
+            updateTransaction(initialData.id, transactionData);
         } else {
-            addTransaction({
-                type: activeType,
-                description,
-                value: numValue,
-                category,
-                date,
-                method: activeType === 'expense' ? method : null,
-                // Add status if it's a recurring bill category
-                status: (activeType === 'expense' && ['Água', 'Luz', 'Internet'].includes(category)) ? invoiceStatus : null
-            });
+            // Create new transaction(s)
+            if (activeType === 'expense' && method === 'card' && isInstallment && installments > 1) {
+                const installmentValue = numValue / installments;
+                let currentDate = new Date(date);
+
+                for (let i = 0; i < installments; i++) {
+                    addTransaction({
+                        ...transactionData,
+                        description: `${description} (${i + 1}/${installments})`,
+                        value: Number(installmentValue.toFixed(2)),
+                        date: currentDate.toISOString().split('T')[0],
+                    });
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                }
+            } else {
+                addTransaction(transactionData);
+            }
         }
 
         onClose();
@@ -239,7 +235,7 @@ const TransactionForm = ({ onClose }) => {
             )}
 
             <button type="submit" className={styles.submitBtn}>
-                Cadastrar
+                {initialData ? 'Salvar Alterações' : 'Cadastrar'}
             </button>
         </form>
     );
