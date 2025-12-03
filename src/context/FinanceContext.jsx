@@ -108,15 +108,43 @@ export const FinanceProvider = ({ children }) => {
         await updateTransaction(id, { status: newStatus });
     };
 
-    // Computed Values
-    const income = transactions
+    const [currentDate, setCurrentDate] = useState(new Date());
+
+    const nextMonth = () => {
+        setCurrentDate(prev => {
+            const next = new Date(prev);
+            next.setMonth(prev.getMonth() + 1);
+            return next;
+        });
+    };
+
+    const prevMonth = () => {
+        setCurrentDate(prev => {
+            const prevDate = new Date(prev);
+            prevDate.setMonth(prev.getMonth() - 1);
+            return prevDate;
+        });
+    };
+
+    // Filter transactions by current month and year
+    const filteredTransactions = transactions.filter(t => {
+        const tDate = new Date(t.date);
+        // Adjust for timezone offset to ensure correct month comparison
+        // Using getUTCMonth/Year if date is stored as UTC ISO string (YYYY-MM-DD)
+        // Since we store as YYYY-MM-DD string, we can parse it directly
+        // But to be safe with timezone shifts, let's treat the string parts directly
+        const [year, month] = t.date.split('-').map(Number);
+
+        return month === (currentDate.getMonth() + 1) && year === currentDate.getFullYear();
+    });
+
+    // Computed Values based on FILTERED transactions
+    const income = filteredTransactions
         .filter((t) => t.type === 'income')
         .reduce((acc, curr) => acc + curr.value, 0);
 
-    const expense = transactions
+    const expense = filteredTransactions
         .filter((t) => {
-            // Include if it's an expense/invoice AND (status is paid OR status is undefined/null)
-            // This effectively excludes any transaction with status === 'open'
             const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
             const isPaidOrNoStatus = t.status === 'paid' || !t.status;
             return isExpenseOrInvoice && isPaidOrNoStatus;
@@ -127,7 +155,7 @@ export const FinanceProvider = ({ children }) => {
 
     const getExpensesByCategory = () => {
         const categories = {};
-        transactions
+        filteredTransactions
             .filter((t) => {
                 const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
                 const isPaidOrNoStatus = t.status === 'paid' || !t.status;
@@ -145,7 +173,8 @@ export const FinanceProvider = ({ children }) => {
     return (
         <FinanceContext.Provider
             value={{
-                transactions,
+                transactions: filteredTransactions, // Expose filtered transactions as the default list
+                allTransactions: transactions, // Expose all if needed
                 addTransaction,
                 removeTransaction,
                 updateTransaction,
@@ -155,7 +184,10 @@ export const FinanceProvider = ({ children }) => {
                 balance,
                 getExpensesByCategory,
                 loading,
-                error
+                error,
+                currentDate,
+                nextMonth,
+                prevMonth
             }}
         >
             {children}

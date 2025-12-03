@@ -6,12 +6,12 @@ import TransactionForm from './TransactionForm';
 import TransactionList from './TransactionList';
 import CategoryBreakdown from './CategoryBreakdown';
 import styles from './Dashboard.module.css';
-import { SignOut, Plus, Wallet, TrendUp, TrendDown, ChartBar, House } from '@phosphor-icons/react';
+import { SignOut, Plus, Wallet, TrendUp, TrendDown, ChartBar, House, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import MonthlyAnalytics from './MonthlyAnalytics';
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
-    const { income, expense, balance } = useFinance();
+    const { income, expense, balance, currentDate, nextMonth, prevMonth } = useFinance();
     const [showForm, setShowForm] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');
     const [editingTransaction, setEditingTransaction] = useState(null);
@@ -37,6 +37,18 @@ const Dashboard = () => {
                     <SignOut size={24} />
                 </button>
             </header>
+
+            <div className={styles.monthSelector}>
+                <button onClick={prevMonth} className={styles.navBtn}>
+                    <CaretLeft size={24} />
+                </button>
+                <span className={styles.currentMonth}>
+                    {currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                </span>
+                <button onClick={nextMonth} className={styles.navBtn}>
+                    <CaretRight size={24} />
+                </button>
+            </div>
 
             <div className={styles.tabs}>
                 <button
