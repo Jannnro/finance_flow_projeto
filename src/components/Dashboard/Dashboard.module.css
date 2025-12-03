@@ -20,6 +20,61 @@
     border-radius: 8px;
     transition: all 0.2s;
 }
+
+.tabBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.activeTab {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.monthSelector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.currentMonth {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: capitalize;
+    min-width: 150px;
+    text-align: center;
+}
+
+.navBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
 .header {
@@ -202,5 +257,14 @@
         width: 95%;
         max-height: 90vh;
         overflow-y: auto;
+    }
+
+    .monthSelector {
+        margin-bottom: 1.5rem;
+        padding: 0.6rem;
+    }
+
+    .currentMonth {
+        font-size: 1.1rem;
     }
 }
