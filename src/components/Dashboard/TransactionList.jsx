@@ -41,19 +41,7 @@ const TransactionList = ({ onEdit }) => {
                             <span className={styles.category}>{t.category}</span>
                             <span className={styles.date}>
                                 {t.type === 'invoice' ? 'Vence: ' : ''}
-                                {(() => {
-                                    try {
-                                        if (!t.date) return 'Sem data';
-                                        const date = new Date(t.date);
-                                        if (isNaN(date.getTime())) return 'Data inválida';
-                                        // Adjust for timezone to prevent off-by-one error
-                                        const [year, month, day] = t.date.split('-').map(Number);
-                                        const localDate = new Date(year, month - 1, day);
-                                        return localDate.toLocaleDateString('pt-BR');
-                                    } catch (e) {
-                                        return 'Erro na data';
-                                    }
-                                })()}
+                                {new Date(t.date).toLocaleDateString('pt-BR')}
                             </span>
                             {t.method && t.type !== 'invoice' && <span className={styles.method}>• {t.method === 'pix' ? 'Pix' : 'Cartão'}</span>}
                         </div>
