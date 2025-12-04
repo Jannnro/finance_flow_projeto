@@ -36,34 +36,3 @@
 .balance .value {
     color: var(--text-main);
 }
-
-/* Stacked Balance Layout */
-.balanceContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-}
-
-.balanceRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.balanceLabel {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-.balanceRow .value {
-    font-size: 1.5rem;
-    /* Smaller font for stacked view */
-}
-
-.divider {
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 0.2rem 0;
-}
