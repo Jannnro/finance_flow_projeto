@@ -138,33 +138,46 @@ export const FinanceProvider = ({ children }) => {
         return month === (currentDate.getMonth() + 1) && year === currentDate.getFullYear();
     });
 
-    // Computed Values based on FILTERED transactions
-    const income = filteredTransactions
-        .filter((t) => t.type === 'income')
-        .reduce((acc, curr) => acc + curr.value, 0);
-
-    const expense = filteredTransactions
+    // --- 1st Half (Day 1-15) ---
+    const income15 = filteredTransactions
         .filter((t) => {
-            const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
-            const isPaidOrNoStatus = t.status === 'paid' || !t.status;
-            return isExpenseOrInvoice && isPaidOrNoStatus;
+            const day = parseInt(t.date.split('-')[2], 10);
+            return t.type === 'income' && day <= 15;
         })
         .reduce((acc, curr) => acc + curr.value, 0);
 
-    // Expense up to day 15 (inclusive)
     const expense15 = filteredTransactions
         .filter((t) => {
             const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
             const isPaidOrNoStatus = t.status === 'paid' || !t.status;
-            // Check if day is <= 15
-            // t.date is YYYY-MM-DD
             const day = parseInt(t.date.split('-')[2], 10);
             return isExpenseOrInvoice && isPaidOrNoStatus && day <= 15;
         })
         .reduce((acc, curr) => acc + curr.value, 0);
 
-    const balance = income - expense; // Balance 30 (Full Month)
-    const balance15 = income - expense15; // Balance 15
+    const balance15 = income15 - expense15;
+
+    // --- 2nd Half (Day 16-31) ---
+    const income2nd = filteredTransactions
+        .filter((t) => {
+            const day = parseInt(t.date.split('-')[2], 10);
+            return t.type === 'income' && day > 15;
+        })
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const expense2nd = filteredTransactions
+        .filter((t) => {
+            const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
+            const isPaidOrNoStatus = t.status === 'paid' || !t.status;
+            const day = parseInt(t.date.split('-')[2], 10);
+            return isExpenseOrInvoice && isPaidOrNoStatus && day > 15;
+        })
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const balance2nd = income2nd - expense2nd;
+
+    // Total Month (remains for other uses if needed, but Dashboard will use splits)
+    const balance = income - expense;
 
     const getExpensesByCategory = () => {
         const categories = {};
@@ -196,6 +209,7 @@ export const FinanceProvider = ({ children }) => {
                 expense,
                 balance,
                 balance15,
+                balance2nd,
                 getExpensesByCategory,
                 loading,
                 error,
