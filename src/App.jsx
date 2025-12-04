@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { FinanceProvider } from './context/FinanceContext';
 import Login from './components/Auth/Login';
 import Dashboard from './components/Dashboard/Dashboard';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const AppContent = () => {
   const { user, loading } = useAuth();
@@ -16,11 +17,13 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <FinanceProvider>
-        <AppContent />
-      </FinanceProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <FinanceProvider>
+          <AppContent />
+        </FinanceProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
