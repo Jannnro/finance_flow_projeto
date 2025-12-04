@@ -141,6 +141,19 @@ export const FinanceProvider = ({ children }) => {
         return month === (currentDate.getMonth() + 1) && year === currentDate.getFullYear();
     });
 
+    // Computed Values based on FILTERED transactions
+    const income = filteredTransactions
+        .filter((t) => t.type === 'income')
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const expense = filteredTransactions
+        .filter((t) => {
+            const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
+            const isPaidOrNoStatus = t.status === 'paid' || !t.status;
+            return isExpenseOrInvoice && isPaidOrNoStatus;
+        })
+        .reduce((acc, curr) => acc + curr.value, 0);
+
     // Total Month
     const balance = income - expense;
 
