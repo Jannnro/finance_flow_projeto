@@ -151,7 +151,20 @@ export const FinanceProvider = ({ children }) => {
         })
         .reduce((acc, curr) => acc + curr.value, 0);
 
-    const balance = income - expense;
+    // Expense up to day 15 (inclusive)
+    const expense15 = filteredTransactions
+        .filter((t) => {
+            const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
+            const isPaidOrNoStatus = t.status === 'paid' || !t.status;
+            // Check if day is <= 15
+            // t.date is YYYY-MM-DD
+            const day = parseInt(t.date.split('-')[2], 10);
+            return isExpenseOrInvoice && isPaidOrNoStatus && day <= 15;
+        })
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const balance = income - expense; // Balance 30 (Full Month)
+    const balance15 = income - expense15; // Balance 15
 
     const getExpensesByCategory = () => {
         const categories = {};
@@ -182,6 +195,7 @@ export const FinanceProvider = ({ children }) => {
                 income,
                 expense,
                 balance,
+                balance15,
                 getExpensesByCategory,
                 loading,
                 error,

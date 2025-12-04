@@ -11,7 +11,7 @@ import MonthlyAnalytics from './MonthlyAnalytics';
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
-    const { income, expense, balance, currentDate, nextMonth, prevMonth } = useFinance();
+    const { income, expense, balance, balance15, currentDate, nextMonth, prevMonth } = useFinance();
     const [showForm, setShowForm] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');
     const [editingTransaction, setEditingTransaction] = useState(null);
@@ -73,6 +73,8 @@ const Dashboard = () => {
                         <SummaryCard
                             title="Saldo Total"
                             value={balance}
+                            value15={balance15}
+                            value30={balance}
                             icon={<Wallet size={32} weight="duotone" />}
                             type="balance"
                         />
