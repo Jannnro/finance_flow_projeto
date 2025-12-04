@@ -37,35 +37,33 @@
     color: var(--text-main);
 }
 
-/* Tabs for Balance Card */
-.tabs {
+/* Stacked Balance Layout */
+.balanceContainer {
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.25rem;
-    border-radius: 8px;
-    width: fit-content;
+    margin-top: 0.5rem;
 }
 
-.tab {
-    background: transparent;
-    border: none;
+.balanceRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.balanceLabel {
+    font-size: 0.9rem;
     color: var(--text-muted);
-    padding: 0.3rem 0.8rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
 }
 
-.tab:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.05);
+.balanceRow .value {
+    font-size: 1.5rem;
+    /* Smaller font for stacked view */
 }
 
-.tab.active {
+.divider {
+    height: 1px;
     background: rgba(255, 255, 255, 0.1);
-    color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0.2rem 0;
 }
