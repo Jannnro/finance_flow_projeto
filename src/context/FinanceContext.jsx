@@ -141,7 +141,10 @@ export const FinanceProvider = ({ children }) => {
     // --- 1st Half (Day 1-15) ---
     const income15 = filteredTransactions
         .filter((t) => {
-            const day = parseInt(t.date.split('-')[2], 10);
+            if (!t.date) return false;
+            const parts = t.date.split('-');
+            if (parts.length < 3) return false;
+            const day = parseInt(parts[2], 10);
             return t.type === 'income' && day <= 15;
         })
         .reduce((acc, curr) => acc + curr.value, 0);
@@ -150,7 +153,12 @@ export const FinanceProvider = ({ children }) => {
         .filter((t) => {
             const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
             const isPaidOrNoStatus = t.status === 'paid' || !t.status;
-            const day = parseInt(t.date.split('-')[2], 10);
+
+            if (!t.date) return false;
+            const parts = t.date.split('-');
+            if (parts.length < 3) return false;
+            const day = parseInt(parts[2], 10);
+
             return isExpenseOrInvoice && isPaidOrNoStatus && day <= 15;
         })
         .reduce((acc, curr) => acc + curr.value, 0);
@@ -160,7 +168,10 @@ export const FinanceProvider = ({ children }) => {
     // --- 2nd Half (Day 16-31) ---
     const income2nd = filteredTransactions
         .filter((t) => {
-            const day = parseInt(t.date.split('-')[2], 10);
+            if (!t.date) return false;
+            const parts = t.date.split('-');
+            if (parts.length < 3) return false;
+            const day = parseInt(parts[2], 10);
             return t.type === 'income' && day > 15;
         })
         .reduce((acc, curr) => acc + curr.value, 0);
@@ -169,7 +180,12 @@ export const FinanceProvider = ({ children }) => {
         .filter((t) => {
             const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
             const isPaidOrNoStatus = t.status === 'paid' || !t.status;
-            const day = parseInt(t.date.split('-')[2], 10);
+
+            if (!t.date) return false;
+            const parts = t.date.split('-');
+            if (parts.length < 3) return false;
+            const day = parseInt(parts[2], 10);
+
             return isExpenseOrInvoice && isPaidOrNoStatus && day > 15;
         })
         .reduce((acc, curr) => acc + curr.value, 0);
