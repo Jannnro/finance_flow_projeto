@@ -128,12 +128,15 @@ export const FinanceProvider = ({ children }) => {
 
     // Filter transactions by current month and year
     const filteredTransactions = transactions.filter(t => {
-        const tDate = new Date(t.date);
+        if (!t.date) return false;
+        const parts = t.date.split('-');
+        if (parts.length < 3) return false;
+
         // Adjust for timezone offset to ensure correct month comparison
         // Using getUTCMonth/Year if date is stored as UTC ISO string (YYYY-MM-DD)
         // Since we store as YYYY-MM-DD string, we can parse it directly
         // But to be safe with timezone shifts, let's treat the string parts directly
-        const [year, month] = t.date.split('-').map(Number);
+        const [year, month] = parts.map(Number);
 
         return month === (currentDate.getMonth() + 1) && year === currentDate.getFullYear();
     });
