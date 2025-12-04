@@ -227,8 +227,6 @@ export const FinanceProvider = ({ children }) => {
                 income,
                 expense,
                 balance,
-                balance15,
-                balance2nd,
                 getExpensesByCategory,
                 loading,
                 error,
