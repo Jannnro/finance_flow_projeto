@@ -155,6 +155,55 @@ export const FinanceProvider = ({ children }) => {
         .reduce((acc, curr) => acc + curr.value, 0);
 
     // Total Month
+    // const balance = income - expense; // We can keep this if needed, but we will focus on splits
+
+    // --- Helper for Date Safety ---
+    const getDaySafe = (dateString) => {
+        if (!dateString) return null;
+        const parts = dateString.split('-');
+        if (parts.length < 3) return null;
+        return parseInt(parts[2], 10);
+    };
+
+    // --- 1st Half (Day 1-15) ---
+    const income15 = filteredTransactions
+        .filter((t) => {
+            const day = getDaySafe(t.date);
+            return day !== null && t.type === 'income' && day <= 15;
+        })
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const expense15 = filteredTransactions
+        .filter((t) => {
+            const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
+            const isPaidOrNoStatus = t.status === 'paid' || !t.status;
+            const day = getDaySafe(t.date);
+            return day !== null && isExpenseOrInvoice && isPaidOrNoStatus && day <= 15;
+        })
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const balance15 = income15 - expense15;
+
+    // --- 2nd Half (Day 16-31) ---
+    const income2nd = filteredTransactions
+        .filter((t) => {
+            const day = getDaySafe(t.date);
+            return day !== null && t.type === 'income' && day > 15;
+        })
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const expense2nd = filteredTransactions
+        .filter((t) => {
+            const isExpenseOrInvoice = t.type === 'expense' || t.type === 'invoice';
+            const isPaidOrNoStatus = t.status === 'paid' || !t.status;
+            const day = getDaySafe(t.date);
+            return day !== null && isExpenseOrInvoice && isPaidOrNoStatus && day > 15;
+        })
+        .reduce((acc, curr) => acc + curr.value, 0);
+
+    const balance2nd = income2nd - expense2nd;
+
+    // Global Balance (Sum of filtered view)
     const balance = income - expense;
 
     const getExpensesByCategory = () => {
@@ -186,6 +235,8 @@ export const FinanceProvider = ({ children }) => {
                 income,
                 expense,
                 balance,
+                balance15,
+                balance2nd,
                 getExpensesByCategory,
                 loading,
                 error,
